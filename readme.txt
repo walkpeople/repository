@@ -1,2 +1,2 @@
 #autor by sxl
-#a project with java sovket
+#a project with java socket
