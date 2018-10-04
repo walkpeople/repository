@@ -1,6 +1,2 @@
-Git is a version control sysytem
-Git is free software
-this is second 
-for github
-branch master
-2
+#autor by sxl
+#a project with java sovket
