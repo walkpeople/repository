@@ -45,6 +45,8 @@ class client_window{
 	
 	private Socket client;
 	private boolean isStart=true;
+	private PrintStream out;
+	private Scanner scan;
 	
 	public void chatServer() {
 		init();
@@ -55,10 +57,12 @@ class client_window{
 				// TODO Auto-generated method stub
 				if(isStart) {
 					String ip_adress = ip.getText().trim();
-					System.out.println(ip_adress);
 					try {
 						client = new Socket(ip_adress,Integer.valueOf(port.getText().trim()));
-						new Thread(new readThread(user.getText().trim(), client)).start();
+						out = new PrintStream(client.getOutputStream());
+						out.println("ç”¨æˆ·  "+user.getText().trim()+" "+"ä¸Šçº¿");
+						scan = new Scanner(client.getInputStream());
+						new Thread(new readThread(user.getText().trim(), client,scan)).start();
 						port.setEditable(false);
 						ip.setEditable(false);
 						user.setEditable(false);
@@ -77,6 +81,9 @@ class client_window{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				area2.append("ä½ å·²ç»é€€å‡º");
+				scan.close();
+				out.close();
 				
 			}
 		});
@@ -87,11 +94,10 @@ class client_window{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				try {
-					PrintStream out = new PrintStream(client.getOutputStream());
 					String msg = msg_tf.getText().trim();
-					out.println(user.getText().trim()+"Ëµ£º"+msg);
+					out.println(user.getText().trim()+"è¯´ï¼š"+msg);
 					msg_tf.setText("");
-				} catch (IOException e1) {
+				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -108,14 +114,14 @@ class client_window{
 		ip = new JTextField(10);
 		port = new JTextField(6);
 		user = new JTextField(10);
-		start = new JButton("Æô¶¯");
-		stop = new JButton("Í£Ö¹");
-		northpanel.setBorder(new TitledBorder("ÅäÖÃĞÅÏ¢"));
-		northpanel.add(new JLabel("Ö÷»úµØÖ·"));
+		start = new JButton("å¯åŠ¨");
+		stop = new JButton("åœæ­¢");
+		northpanel.setBorder(new TitledBorder("é…ç½®ä¿¡æ¯"));
+		northpanel.add(new JLabel("ä¸»æœºåœ°å€Ö·"));
 		northpanel.add(ip);
-		northpanel.add(new JLabel("¶Ë¿ÚºÅ"));
+		northpanel.add(new JLabel("ç«¯å£å·"));
 		northpanel.add(port);
-		northpanel.add(new JLabel("ÓÃ»§Ãû"));
+		northpanel.add(new JLabel("ç”¨æˆ·å"));
 		northpanel.add(user);
 		northpanel.add(start);
 		northpanel.add(stop);
@@ -124,10 +130,10 @@ class client_window{
 		jf.setLayout(new BorderLayout());
 		
 		jmb = new JMenuBar();
-		record= new JMenu("¼ÇÂ¼");
-		save = new JMenuItem("±£´æ");
-		format= new JMenu("¸ñÊ½");
-		font = new JMenuItem("×ÖÌå");
+		record= new JMenu("è®°å½•");
+		save = new JMenuItem("ä¿å­˜");
+		format= new JMenu("æ ¼å¼");
+		font = new JMenuItem("å­—ä½“");
 		record.add(save);
 		format.add(font);
 		jmb.add(record);
@@ -136,12 +142,12 @@ class client_window{
 		area1 = new JTextArea();
 		area1.setEditable(true);
 		JScrollPane leftpanel = new JScrollPane(area1);
-		leftpanel.setBorder(new TitledBorder("ÔÚÏßÈËÊı"));
+		leftpanel.setBorder(new TitledBorder("åœ¨çº¿äººæ•°"));
 		
 		area2 = new JTextArea();
 		JScrollPane rightpanel = new JScrollPane(area2);
 		area2.setEditable(true);
-		rightpanel.setBorder(new TitledBorder("ÁÄÌìĞÅÏ¢"));
+		rightpanel.setBorder(new TitledBorder("èŠå¤©ä¿¡æ¯"));
 		
 		centerpanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		centerpanel.setLeftComponent(leftpanel);
@@ -149,9 +155,9 @@ class client_window{
 		centerpanel.setDividerLocation(100);
 		
 		southpanel = new JPanel();
-		southpanel.setBorder(new TitledBorder("·¢ÏûÏ¢"));
+		southpanel.setBorder(new TitledBorder("å‘æ¶ˆæ¯"));
 		msg_tf = new JTextField(45);
-		send = new JButton("·¢ËÍ");
+		send = new JButton("å‘é€");
 		southpanel.add(msg_tf);
 		southpanel.add(send);
 		
@@ -170,13 +176,17 @@ class client_window{
 		
 		private String name;
 		private Socket client;
-		
-		
-		public readThread(String name, Socket client) {
+		private Scanner scan;
+
+		public readThread(String name, Socket client, Scanner scan) {
 			super();
 			this.name = name;
 			this.client = client;
+			this.scan = scan;
 		}
+
+
+
 
 		@Override
 		public void run() {
@@ -184,13 +194,12 @@ class client_window{
 			try {
 				boolean flag = true;
 				while(flag) {
-					Scanner scan = new Scanner(client.getInputStream());
 					if(scan.hasNext()) {
 						String msg = scan.nextLine().trim();
 						if("bye".equals(msg)) {
 							scan.close();
 							client.close();
-							area2.append("ÒÑ¶Ï¿ªÁ¬½Ó"+"\n");
+							area2.append("å·²æ–­å¼€è¿æ¥"+"\n");
 							flag = false;
 						}else {
 							area2.append(msg+"\n");
