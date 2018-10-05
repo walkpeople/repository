@@ -99,9 +99,7 @@ class two_window {
 					JOptionPane.showMessageDialog(null, "输入不能为空");
 				}
 				String msg_send = msg_tf.getText();
-				System.out.println(client_list.size());
 				sendMessage(msg_send);
-				System.out.println(client_list.size());
 				msg_tf.setText("");
 			}
 		});
@@ -176,7 +174,6 @@ class two_window {
 			for (Socket client : client_list) {
 				out = new PrintStream(client.getOutputStream());
 				out.println(msg);
-				System.out.println(client_list.size());
 				// out.close();
 			}
 		} catch (IOException e) {
@@ -201,8 +198,10 @@ class two_window {
 				try {
 					Socket client = server.accept();
 					client_list.add(client);
+					String len = "在线人数为"+client_list.size();
+					area1.setText(len);
+					sendMessage(len);
 					new Thread(new Listenthread(client)).start();
-					System.out.println(client_list.size());
 				}
 				catch (IOException e) {
 					// TODO Auto-generated catch block
