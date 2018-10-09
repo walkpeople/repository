@@ -21,8 +21,8 @@ public class shell_server {
 				Socket client = server.accept();
 				out = new PrintStream(client.getOutputStream());
 				client_list.add(client);
-				out.println("在线人数为："+client_list.size());
-				new Thread(new listenThread(client,client_list)).start();
+				out.println("在线人数为：" + client_list.size());
+				new Thread(new listenThread(client, client_list)).start();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -49,30 +49,38 @@ class listenThread implements Runnable {
 		boolean flag = true;
 		Scanner scan;
 		try {
-			scan = new Scanner(client.getInputStream());
+			scan = new Scanner(client.getInputStream(), "UTF-8");
 			while (flag) {
 				if (scan.hasNext()) {
 					String msg = scan.nextLine().trim();
-					if ("bye".equals(msg)) {
-						client_list.remove(client);
-						scan.close();
-						flag =false;
-					} else {
-						if(msg.contains("说") || msg.contains("上线")) {
-						for(Socket cl:client_list) {
-							PrintStream out = new PrintStream(cl.getOutputStream());
-							out.println(msg);
-							//out.close();
-						}
-						System.out.println(msg);
-						}else {
-							System.out.println(msg+"退出");
+						if (! msg.contains("903ff46c-dcad-4671-b186-a716f357ec78")) {
+							for (Socket cl : client_list) {
+								PrintStream out = new PrintStream(cl.getOutputStream());
+								if (msg.contains("上线")) {
+									out.println("在线人数为"+client_list.size());
+									out.println(msg);
+								}else {
+									out.println(msg);
+								}
+								// out.close();
+							}
+							System.out.println(msg);
+						} else {
 							client_list.remove(client);
-							
+							String msg_split[] = msg.split("9");
+							System.out.println("用户"+msg_split[0] + "退出");
+							for(Socket cle : client_list) {
+								PrintStream out = new PrintStream(cle.getOutputStream());
+									out.println("在线人数为"+client_list.size());
+									out.println("用户"+msg_split[0] + "退出");
+							}
+							scan.close();
+							out.close();
+							flag = false;
+
 						}
 					}
 				}
-			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,7 +88,3 @@ class listenThread implements Runnable {
 	}
 
 }
-
-
-	
-

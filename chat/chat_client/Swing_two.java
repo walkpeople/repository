@@ -63,10 +63,10 @@ class client_window{
 					String ip_adress = ip.getText().trim();
 					try {
 						client = new Socket(ip_adress, Integer.valueOf(port.getText().trim()));
-						out = new PrintStream(client.getOutputStream());
+						out = new PrintStream(client.getOutputStream(),true,"utf-8");
 						out.println("用户  " + user.getText().trim() + " " + "上线");
 						exit = true;
-						scan = new Scanner(client.getInputStream());
+						scan = new Scanner(client.getInputStream(),"utf-8");
 						new Thread(new readThread(user.getText().trim(), client, scan)).start();
 						port.setEditable(false);
 						ip.setEditable(false);
@@ -88,7 +88,7 @@ class client_window{
 				// TODO Auto-generated method stub
 				area2.append("你已经退出"+"\n");
 				try {
-					out.println("bye");
+					out.println(user.getText()+"903ff46c-dcad-4671-b186-a716f357ec78");
 					area1.setText("");
 					client.close();
 					out.close();
@@ -251,7 +251,7 @@ class client_window{
 				while (flag) {
 					if (scan.hasNext()) {
 						String msg = scan.nextLine().trim();
-						if (msg.contains("在")) {
+						if (msg.contains("在线人数")) {
 							area1.setText(msg);
 						} else {
 							if ("bye".equals(msg)) {
